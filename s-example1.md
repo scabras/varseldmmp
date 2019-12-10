@@ -1,9 +1,25 @@
+------------------------------------------------------------------------
+
+title: “Simulation example 1”
+
+author: “Stefano Cabras - UNICA / UC3M”
+
+date: “10/12/2019”
+
+output: md\_document
+
+bibliography: biblio-msdpmp.bib
+
+------------------------------------------------------------------------
+
 Set up
 ======
 
-    rm(list=ls())
-    set.seed(11)
-    library(BayesVarSel)
+    rm(list=ls()) 
+
+    set.seed(11) 
+
+    library(BayesVarSel) 
 
     ## Loading required package: MASS
 
@@ -11,36 +27,49 @@ Set up
 
     ## Loading required package: parallel
 
-    library(mixdir)
-    p=200
-    n=50
-    nsim.gibbs=10000
-    m1=3
-    signaltonoise=3
+    library(mixdir) 
+
+    p=200 
+
+    n=50 
+
+    nsim.gibbs=10000 
+
+    m1=3 
+
+    signaltonoise=3 
 
 Suppose we have 200 covariates and 50 iid observations from a regression
 model where intercept and 197 coefficients are zero while the first 3
 covariates are 3 and errors with variance 1.
 
-    x=cbind(1,array(rnorm(n*p,0,1),dim=c(n,p)))
-    betas=c(0,c(1,1,1)*signaltonoise,rep(0,p-3))
-    colnames(x)=c("I",paste("x",1:p,sep=""))
-    true.mod=(betas>0)*1
-    names(true.mod)=colnames(x)
-    y=x%*%betas+rnorm(n,0,1)
-    simdat=data.frame(y,x)
+    x=cbind(1,array(rnorm(n*p,0,1),dim=c(n,p))) 
 
-Usual analsysis with Gibbs sampling on model space.
-===================================================
+    betas=c(0,c(1,1,1)*signaltonoise,rep(0,p-3)) 
+
+    colnames(x)=c("I",paste("x",1:p,sep="")) 
+
+    true.mod=(betas>0)*1 
+
+    names(true.mod)=colnames(x) 
+
+    y=x%*%betas+rnorm(n,0,1) 
+
+    simdat=data.frame(y,x) 
+
+Usual analysis with Gibbs sampling on model space.
+==================================================
 
 Suppose to explore the model space with 10^{4} steps using Gibbs
 Sampling, starting from the full and assuming a constant prior on model
 space (only to perform Gibb Sampling). BF factors are calculated using
 the conventional prior.
 
-    res.GibbsBvs<- GibbsBvs(formula= y ~ ., data=simdat, prior.betas="gZellner",
-                            prior.models="Constant", n.iter=nsim.gibbs, init.model="Full", n.burnin=100,
-                            time.test = FALSE)
+    res.GibbsBvs<- GibbsBvs(formula= y ~ ., data=simdat, prior.betas="gZellner", 
+
+                            prior.models="Constant", n.iter=nsim.gibbs, init.model="Full", n.burnin=100, 
+
+                            time.test = FALSE) 
 
     ## Info. . . .
     ## Most complex model has 202 covariates
@@ -51,7 +80,7 @@ the conventional prior.
     ## Then, 10000 are kept and used to construct the summaries
     ## Working on the problem...please wait.
 
-    summary(res.GibbsBvs)
+    summary(res.GibbsBvs) 
 
     ## 
     ## Call:
@@ -270,14 +299,17 @@ the conventional prior.
 From exploration steps we need at least the set of visited models in all
 performed Gibbs steps (BFs are ignored).
 
-    xx=res.GibbsBvs$modelslogBF
-    dim(xx)
+    xx=res.GibbsBvs$modelslogBF 
+
+    dim(xx) 
 
     ## [1] 10000   202
 
-    ww=xx[,ncol(xx)]
-    xx=xx[,-ncol(xx)]
-    image(xx[,1:10])
+    ww=xx[,ncol(xx)] 
+
+    xx=xx[,-ncol(xx)] 
+
+    image(xx[,1:10]) 
 
 ![](s-example1_files/figure-markdown_strict/unnamed-chunk-4-1.svg)
 
@@ -287,83 +319,91 @@ into a part of the model space.
 A refinement using DPMP
 =======================
 
-Not all model into the model space can be visited, only those with
+Not all models into the model space can be visited, only those with
 *p* − *n* − 1 covariates (149 in this case). The full model space is
 given by the hyper contingency table made by crossing *p* 0/1
-categorical variables with 2 leves and thus by 2<sup>*p*</sup> cells
+categorical variables with 2 levels and thus by 2<sup>*p*</sup> cells
 (1.60693810^{60} in this case). On the probability distribution of such
-contingecy table we assume a Dirichlet process prior (which is the prior
-on model space) and the data are the samples from Gibbs step. This model
-is proposed here Dunson and Xing (2009).
+contingency table we assume a Dirichlet process prior (which is the
+prior on model space) and the data are the samples from Gibbs step. This
+model is proposed here (<span class="citeproc-not-found"
+data-reference-id="Dunson2009">**???**</span>).
 
-    mdat=data.frame(xx)
-    for(i in 1:ncol(mdat)) mdat[,i]=factor(mdat[,i])
+    mdat=data.frame(xx) 
 
-Posterior of cells probabilties (and thus models) is obtained usign the
-variational algorithm detailed in Ahlmann-Eltze and Yau (2018)
-(otherwise Gibbs sampling whould be used as originally proposed in
-Dunson and Xing (2009)). We assume that the latent space has dimension
-2: the space with covariates with cells with high probabilties (in which
-it is supposed to lie the true model) and the set of cells with low
-probabilities (in which there is not the true model)
+    for(i in 1:ncol(mdat)) mdat[,i]=factor(mdat[,i]) 
 
-    res <- mixdir(mdat, n_latent=2,max_iter = 1000)
-    cat(res$converged,"\n")
+Posterior of cells probabilities (and thus models) is obtained using the
+variational algorithm detailed in (<span class="citeproc-not-found"
+data-reference-id="Ahlmann-Eltze2018">**???**</span>) (otherwise Gibbs
+sampling would be used as originally proposed in (<span
+class="citeproc-not-found"
+data-reference-id="Dunson2009">**???**</span>)). We assume that the
+latent space has dimension 2: the space with covariates with cells with
+high probabilities (in which it is supposed to lie the true model) and
+the set of cells with low probabilities (in which there is not the true
+model)
+
+    res <- mixdir(mdat, n_latent=2,max_iter = 1000) 
+
+    cat(res$converged,"\n") 
 
     ## TRUE
 
-Given one of the latent space, each covariate has a probability to be 1
-or 0 (i.e. included or not included in the model). Lets analyse each
+Given one of the latent spaces, each covariate has a probability to be 1
+or 0 (i.e. included or not included in the model). Let’s analyse each
 latent space separately:
 
 The posterior probability of each covariate for the first latent space
 is (first 3 covariates belong to this latent space with high
 probability):
 
-    pls1=unlist(lapply(res$category_prob,function(x) x[[1]][2]))
-    barplot(pls1[-1],col=c(rep(2,m1),rep(1,p-m1)),las=2,cex.axis=0.5,ylim=c(0,1))
+    pls1=unlist(lapply(res$category_prob,function(x) x[[1]][2])) 
+
+    barplot(pls1[-1],col=c(rep(2,m1),rep(1,p-m1)),las=2,cex.axis=0.5,ylim=c(0,1)) 
 
 ![](s-example1_files/figure-markdown_strict/unnamed-chunk-7-1.svg)
 
 The posterior probability of each covariate for the second latent space
 (which represents the null model):
 
-    pls2=unlist(lapply(res$category_prob,function(x) x[[2]][2]))
-    barplot(pls2[-1],col=c(rep(2,m1),rep(1,p-m1)),las=2,cex.axis=0.5,ylim=c(0,1))
+    pls2=unlist(lapply(res$category_prob,function(x) x[[2]][2])) 
+
+    barplot(pls2[-1],col=c(rep(2,m1),rep(1,p-m1)),las=2,cex.axis=0.5,ylim=c(0,1)) 
 
 ![](s-example1_files/figure-markdown_strict/unnamed-chunk-8-1.svg)
 
 Comparison among the two analysis
 =================================
 
-Lets compare the posterior inclusion probability with just Gibbs
+Let’s compare the posterior inclusion probability with just Gibbs
 sampling with the posterior probability using the DPMP:
 
-    exdetail=paste("nGiibsBVS=",nsim.gibbs," signaltonoise=",signaltonoise,sep="")
-    par(mfrow=c(2,1))
-    barplot(pls1,col=true.mod+1,
-            main=exdetail,
-            ylab="Post. Prob. DMMP",ylim=c(0,1))
-    barplot(res.GibbsBvs$inclprob,col=true.mod+1,ylab="Post. Inclusion Prob.",ylim=c(0,1))
+    exdetail=paste("nGiibsBVS=",nsim.gibbs," signaltonoise=",signaltonoise,sep="") 
+
+    par(mfrow=c(2,1)) 
+
+    barplot(pls1,col=true.mod+1, 
+
+            main=exdetail, 
+
+            ylab="Post. Prob. DMMP",ylim=c(0,1)) 
+
+    barplot(res.GibbsBvs$inclprob,col=true.mod+1,ylab="Post. Inclusion Prob.",ylim=c(0,1)) 
 
 ![](s-example1_files/figure-markdown_strict/unnamed-chunk-9-1.svg)
 
-    par(mfrow=c(1,1))
-    plot(res.GibbsBvs$inclprob,pls1,col=true.mod+1,cex=1,pch=19,
-         xlab="Post. Inclusion Prob.",ylab="Post. Prob. DMMP",main=exdetail,ylim=c(0,1),xlim=c(0,1))
-    points(res.GibbsBvs$inclprob[true.mod==1],pls1[true.mod==1],col=2,cex=1,pch=23)
-    abline(0,1,lty=2)
+    par(mfrow=c(1,1)) 
+
+    plot(res.GibbsBvs$inclprob,pls1,col=true.mod+1,cex=1,pch=19, 
+
+         xlab="Post. Inclusion Prob.",ylab="Post. Prob. DMMP",main=exdetail,ylim=c(0,1),xlim=c(0,1)) 
+
+    points(res.GibbsBvs$inclprob[true.mod==1],pls1[true.mod==1],col=2,cex=1,pch=23) 
+
+    abline(0,1,lty=2) 
 
 ![](s-example1_files/figure-markdown_strict/unnamed-chunk-10-1.svg)
 
 References
 ==========
-
-Ahlmann-Eltze, Constantin, and Christopher Yau. 2018. “MixDir: Scalable
-Bayesian Clustering for High-Dimensional Categorical Data.” In *2018
-Ieee 5th International Conference on Data Science and Advanced Analytics
-(Dsaa)*, 526–39. IEEE.
-
-Dunson, David B, and Chuanhua Xing. 2009. “Nonparametric Bayes Modeling
-of Multivariate Categorical Data.” *Journal of the American Statistical
-Association* 104 (487). Taylor & Francis: 1042–51.
