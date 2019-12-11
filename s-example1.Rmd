@@ -43,11 +43,10 @@ simdat=data.frame(y,x)
 
 Suppose to explore the model space with `r nsim.gibbs` steps using Gibbs Sampling, starting from the full and assuming a constant prior on model space (only to perform Gibb Sampling). BF factors are calculated using the conventional prior. 
 
-```{r} 
+```{r,cache=TRUE} 
 res.GibbsBvs<- GibbsBvs(formula= y ~ ., data=simdat, prior.betas="gZellner", 
                         prior.models="Constant", n.iter=nsim.gibbs, init.model="Full", n.burnin=100, 
-                        time.test = FALSE) 
-summary(res.GibbsBvs) 
+                        time.test = FALSE)
 ``` 
 
 
@@ -62,7 +61,15 @@ xx=xx[,-ncol(xx)]
 image(xx[,1:10]) 
 ``` 
 
-This matrix is the of 0/1s that provides evidence for the true model into a part of the model space. 
+This matrix is the of 0/1s that provides evidence for the true model into a part of the model space. In this case the explored models have the following sizes:
+
+```{r}
+barplot(table(rowSums(xx)),xlab="Model sizes")
+abline(v=n,lty=2)
+```
+
+
+
 
 # A refinement using DPMP 
 Not all models into the model space can be visited, only those with $p-n-1$ covariates (`r p-n-1` in this case). The full model space is given by the hyper contingency table made by crossing $p$ 0/1 categorical variables with 2 levels and thus by $2^p$ cells (`r 2^p` in this case). On the probability distribution of such contingency table we assume a Dirichlet process prior (which is the prior on model space) and the data are the samples from Gibbs step. This model is proposed here @Dunson2009. 
@@ -74,7 +81,7 @@ for(i in 1:ncol(mdat)) mdat[,i]=factor(mdat[,i])
 
 Posterior of cells probabilities (and thus models) is obtained using the variational algorithm detailed in @Ahlmann-Eltze2018 (otherwise Gibbs sampling would be used as originally proposed in @Dunson2009). We assume that the latent space has dimension 2: the space with covariates with cells with high probabilities (in which it is supposed to lie the true model) and the set of cells with low probabilities (in which there is not the true model) 
 
-```{r} 
+```{r,cache=TRUE} 
 res <- mixdir(mdat, n_latent=2,max_iter = 1000) 
 cat(res$converged,"\n") 
 ``` 
@@ -127,6 +134,71 @@ abline(0,1,lty=2)
 ``` 
 
 
+# Riboflavin Genomic Data
+
+Consider the Riboflavin data set. Dataset of riboflavin production by Bacillus subtilis containing $n=71$ observations of $p=4088$ predictors (gene expressions) and a one-dimensional response (riboflavin production).
+
+```{r}
+library(hdi)
+data(riboflavin)
+dim(riboflavin)
+```
+
+
+
+## Analysis with Non-local prior and Gibbs sampling
+
+```{r,cache=TRUE}
+library(mombf)
+res.nonlocal<- modelSelection(y=riboflavin$y, x=riboflavin$x,
+                       scale=T, center=T,burnin = 100,niter = nsim.gibbs)
+res.nonlocal$margpp[res.nonlocal$margpp>.5]
+```
+
+## Analysis with Conventional prior and Gibbs sampling
+
+```{r,cache=TRUE}
+res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),prior.betas = "gZellner",n.iter=nsim.gibbs+100, init.model="Full", n.burnin=100, time.test = FALSE)
+res.conventional$inclprob[res.conventional$inclprob>0.5]
+```
+
+## Results with Dirichlet Process prior
+
+### Using Gibb sampling with non-local priors
+
+Size of explored models
+
+```{r}
+nlp.gibbs=res.nonlocal$postSample
+nlp.gibbs=nlp.gibbs[,colSums(nlp.gibbs)>20]
+dim(nlp.gibbs)
+barplot(table(rowSums(nlp.gibbs)))
+```
+
+```{r,cache=TRUE}
+res.nlp <- mixdir(nlp.gibbs, n_latent=2,max_iter = 1000)
+pls.nlp=unlist(lapply(res.nlp$category_prob,function(x) x[[1]][2]))
+cat(res.nlp$converged,"\n") 
+pls.nlp[pls.nlp>0.5]
+```
+
+### Using Gibb sampling with conventional priors
+
+Size of Explored Models
+
+```{r}
+conv.gibbs=res.conventional$modelslogBF[,-ncol(res.conventional$modelslogBF)]
+conv.gibbs=conv.gibbs[,colSums(conv.gibbs)>20]
+dim(conv.gibbs)
+barplot(table(rowSums(conv.gibbs)))
+```
+
+```{r,cache=TRUE}
+res.conv <- mixdir(conv.gibbs, n_latent=2,max_iter = 1000)
+pls.conv=unlist(lapply(res.conv$category_prob,function(x) x[[1]][2]))
+cat(res.conv$converged,"\n") 
+pls.conv[pls.conv>0.5]
+```
 
 # References 
 
