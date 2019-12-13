@@ -45,7 +45,7 @@ Suppose to explore the model space with `r nsim.gibbs` steps using Gibbs Samplin
 
 ```{r,cache=TRUE} 
 res.GibbsBvs<- GibbsBvs(formula= y ~ ., data=simdat, prior.betas="gZellner", 
-                        prior.models="Constant", n.iter=nsim.gibbs, init.model="Full", n.burnin=100, 
+                        prior.models="Constant", n.iter=nsim.gibbs, init.model="Null", n.burnin=100, 
                         time.test = FALSE)
 ``` 
 
@@ -65,7 +65,6 @@ This matrix is the of 0/1s that provides evidence for the true model into a part
 
 ```{r}
 barplot(table(rowSums(xx)),xlab="Model sizes")
-abline(v=n,lty=2)
 ```
 
 
@@ -151,14 +150,15 @@ dim(riboflavin)
 ```{r,cache=TRUE}
 library(mombf)
 res.nonlocal<- modelSelection(y=riboflavin$y, x=riboflavin$x,
-                       scale=T, center=T,burnin = 100,niter = nsim.gibbs)
+                       scale=T, center=T,burnin = 100,
+                       niter = nsim.gibbs+100)
 res.nonlocal$margpp[res.nonlocal$margpp>.5]
 ```
 
 ## Analysis with Conventional prior and Gibbs sampling
 
 ```{r,cache=TRUE}
-res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),prior.betas = "gZellner",n.iter=nsim.gibbs+100, init.model="Full", n.burnin=100, time.test = FALSE)
+res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),prior.betas = "gZellner",n.iter=nsim.gibbs+100, init.model="Null", n.burnin=100, time.test = FALSE)
 res.conventional$inclprob[res.conventional$inclprob>0.5]
 ```
 

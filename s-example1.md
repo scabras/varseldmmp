@@ -39,7 +39,7 @@ space (only to perform Gibb Sampling). BF factors are calculated using
 the conventional prior.
 
     res.GibbsBvs<- GibbsBvs(formula= y ~ ., data=simdat, prior.betas="gZellner", 
-                            prior.models="Constant", n.iter=nsim.gibbs, init.model="Full", n.burnin=100, 
+                            prior.models="Constant", n.iter=nsim.gibbs, init.model="Null", n.burnin=100, 
                             time.test = FALSE)
 
     ## Info. . . .
@@ -70,7 +70,6 @@ into a part of the model space. In this case the explored models have
 the following sizes:
 
     barplot(table(rowSums(xx)),xlab="Model sizes")
-    abline(v=n,lty=2)
 
 ![](s-example1_files/figure-markdown_strict/unnamed-chunk-5-1.svg)
 
@@ -183,7 +182,8 @@ Analysis with Non-local prior and Gibbs sampling
     ## This is mgcv 1.8-31. For overview type 'help("mgcv-package")'.
 
     res.nonlocal<- modelSelection(y=riboflavin$y, x=riboflavin$x,
-                           scale=T, center=T,burnin = 100,niter = nsim.gibbs)
+                           scale=T, center=T,burnin = 100,
+                           niter = nsim.gibbs+100)
 
     ## Using default prior for continuous outcomes priorCoef=momprior(tau=0.348), priorVar=igprior(.01,.01)
     ## Greedy searching posterior mode... Done.
@@ -192,12 +192,12 @@ Analysis with Non-local prior and Gibbs sampling
     res.nonlocal$margpp[res.nonlocal$margpp>.5]
 
     ##   YOAB_at 
-    ## 0.9749598
+    ## 0.9751944
 
 Analysis with Conventional prior and Gibbs sampling
 ---------------------------------------------------
 
-    res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),prior.betas = "gZellner",n.iter=nsim.gibbs+100, init.model="Full", n.burnin=100, time.test = FALSE)
+    res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),prior.betas = "gZellner",n.iter=nsim.gibbs+100, init.model="Null", n.burnin=100, time.test = FALSE)
 
     ## Info. . . .
     ## Most complex model has 4089 covariates
@@ -210,8 +210,8 @@ Analysis with Conventional prior and Gibbs sampling
 
     res.conventional$inclprob[res.conventional$inclprob>0.5]
 
-    ##   YOAB_at   YXLD_at 
-    ## 0.9755446 0.5600000
+    ##   YOAB_at 
+    ## 0.9536634
 
 Results with Dirichlet Process prior
 ------------------------------------
@@ -221,21 +221,10 @@ Results with Dirichlet Process prior
 Size of explored models
 
     nlp.gibbs=res.nonlocal$postSample
-
-    ## Loading required package: mombf
-
-    ## Loading required package: ncvreg
-
-    ## Loading required package: mgcv
-
-    ## Loading required package: nlme
-
-    ## This is mgcv 1.8-31. For overview type 'help("mgcv-package")'.
-
     nlp.gibbs=nlp.gibbs[,colSums(nlp.gibbs)>20]
     dim(nlp.gibbs)
 
-    ## [1] 9900  547
+    ## [1] 10000   549
 
     barplot(table(rowSums(nlp.gibbs)))
 
@@ -250,7 +239,7 @@ Size of explored models
     pls.nlp[pls.nlp>0.5]
 
     ## YOAB_at.1 
-    ## 0.9824065
+    ## 0.9754905
 
 ### Using Gibb sampling with conventional priors
 
@@ -260,7 +249,7 @@ Size of Explored Models
     conv.gibbs=conv.gibbs[,colSums(conv.gibbs)>20]
     dim(conv.gibbs)
 
-    ## [1] 10100   444
+    ## [1] 10100   463
 
     barplot(table(rowSums(conv.gibbs)))
 
@@ -274,8 +263,8 @@ Size of Explored Models
 
     pls.conv[pls.conv>0.5]
 
-    ## ARGB_at.1 YFII_at.1 YLXQ_at.1 YOAB_at.1 YXLD_at.1 
-    ## 0.5875556 0.9963720 0.9745936 0.9998743 0.6153617
+    ## YOAB_at.1 
+    ## 0.9547888
 
 References
 ==========
@@ -287,4 +276,4 @@ Ieee 5th International Conference on Data Science and Advanced Analytics
 
 Dunson, David B, and Chuanhua Xing. 2009. “Nonparametric Bayes Modeling
 of Multivariate Categorical Data.” *Journal of the American Statistical
-Association* 104 (487). Taylor & Francis: 1042–51.
+Association* 104 (487): 1042–51.
