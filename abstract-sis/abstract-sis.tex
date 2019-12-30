@@ -36,14 +36,12 @@
 
 \begin{document}
 
-\title*{Contribution Title in English}
-% Use \titlerunning{Short Title} for an abbreviated version of
-% your contribution title if the original one is too long
-\subtitle{\emph{Contribution Title in Italian}}
-\author{Name of First Author and Name of Second Author}
-% Use \authorrunning{Short Title} for an abbreviated version of
-% your contribution title if the original one is too long
-\institute{Name of First Author \at Name, Address of Institute, \email{name@email.address}
+\title*{Non-parametric prior for variables selection in linear regression}
+\titlerunning{NP prior for variable selection}
+\subtitle{\emph{Uso di una a priori non parametrica per selezione di variabili nella regressione lineare}}
+\author{Stefano Cabras}
+\authorrunning{S. Cabras et al.}
+\institute{Stefano Cabras \at Dipartimento di Matematica e Informatica, Università degli Studi di Cagliari, Via Ospedale, 72 - 09124 Cagliari (Italy) and Department of Statistics, Universidad Carlos III de Madrid, C/Madrid, 126 - 09042 Getafe (Spain), \email{s.cabras@unica.it - stefano.cabras@uc3m.es}
 \and Name of Second Author \at Name, Address of Institute \email{name@email.address}}
 %
 % Use the package "url.sty" to avoid
@@ -52,50 +50,44 @@
 %
 \maketitle
 
-\abstract{The abstract should be written in English and in Italian, each paper should be preceded by an abstract (no more than 10 lines long) that summarizes the content. Please insert your abstract here.}
+\abstract{We consider the problem of variable selection in ordinary linear regression model where the number of covariates is larger than the sample size and big enough to prevent exploration of all possible models. In this context, a stochastic model exploration with Gibbs-sampling is usually performed and limited to models of size no larger than the sample size. Gibbs-sampling also incorporates evidence of Bayes Factors derived either from conventional priors or from non-local priors. The focus here is on the prior on model space for which we explore the use of the Dirichlet Process (DP) prior on the space of all possible models. Models posterior probabilities are approximated combining the DP prior and the output of the Gibbs-sampling.}
 \abstract{\emph{Abstract in Italian}}
-\keywords{key word 1, key word 2, \ldots}
+\keywords{Conventional priors, Dirichlet Process, Non-local priors, Ordinary linear regression, Variable selection}
 
-\section{Section Heading}
-\label{sec:1}
-Use the template \emph{chapter.tex} together with the Springer document class SVMono (monograph-type books) or SVMult (edited books) to style the various elements of your chapter content in the Springer layout.
+\section{Introduction}
+\label{sec:intro}
+\cite{BVSNLP}
 
-Instead of simply listing headings of different levels we recommend to
-let every heading be followed by at least a short passage of text.
-Further on please use the \LaTeX\ automatism for all your
-cross-references and citations. And please note that the first line of
-text that follows a heading is not indented, whereas the first lines of
-all subsequent paragraphs are.
+\section{Dirichlet process prior on model space}
+\label{sec:dp}
 
-\section{Section Heading}
-\label{sec:2}
-% Always give a unique label
-% and use \ref{<label>} for cross-references
-% and \cite{<label>} for bibliographic references
-% use \sectionmark{}
-% to alter or adjust the section heading in the running head
-Instead of simply listing headings of different levels we recommend to
-let every heading be followed by at least a short passage of text.
-Further on please use the \LaTeX\ automatism for all your
-cross-references and citations.
+....
 
-Please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
 
-Use the standard \verb|equation| environment to typeset your equations, e.g.
-%
-\begin{equation}
-a \times b = c\;,
-\end{equation}
-%
-however, for multiline equations we recommend to use the \verb|eqnarray| environment\footnote{In physics texts please activate the class option \texttt{vecphys} to depict your vectors in \textbf{\itshape boldface-italic} type - as is customary for a wide range of physical subjects}.
-\begin{eqnarray}
-a \times b = c \nonumber\\
-\vec{a} \cdot \vec{b}=\vec{c}
-\label{eq:01}
-\end{eqnarray}
+\subsection{Variational algorithm for approximate model posterior probability}
+\label{subsec:variational}
+....
 
-\subsection{Subsection Heading}
-\label{subsec:2}
+
+\section{Examples}
+\label{sec:ex}
+
+
+....
+
+\section{Remarks}
+\label{sec:remarks}
+
+
+
+\bibliographystyle{spbasic.bst}
+\bibliography{biblio-msdpmp.bib}
+
+\end{document}
+
+
+
+
 Instead of simply listing headings of different levels we recommend to
 let every heading be followed by at least a short passage of text.
 Further on please use the \LaTeX\ automatism for all your
@@ -311,5 +303,3 @@ When placed at the end of a chapter or contribution (as opposed to at the end of
 a \times b = c
 \end{equation}
 
-\input{referenc}
-\end{document}
