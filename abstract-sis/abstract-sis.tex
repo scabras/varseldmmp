@@ -36,13 +36,12 @@
 
 \begin{document}
 
-\title*{Non-parametric prior for variables selection in linear regression}
-\titlerunning{NP prior for variable selection}
-\subtitle{\emph{Uso di una a priori non parametrica per selezione di variabili nella regressione lineare}}
+\title*{A Beysian post-processing of Gibbs sampling output for variable selection}
+\titlerunning{Variable selection: post-processing of Gibbs-sampling output}
+\subtitle{\emph{Analisi Bayesiana del Gibbs sampling per la selezione di variabili.}}
 \author{Stefano Cabras}
 \authorrunning{S. Cabras et al.}
-\institute{Stefano Cabras \at Dipartimento di Matematica e Informatica, Università degli Studi di Cagliari, Via Ospedale, 72 - 09124 Cagliari (Italy) and Department of Statistics, Universidad Carlos III de Madrid, C/Madrid, 126 - 09042 Getafe (Spain), \email{s.cabras@unica.it - stefano.cabras@uc3m.es}
-\and Name of Second Author \at Name, Address of Institute \email{name@email.address}}
+\institute{Stefano Cabras \at Dipartimento di Matematica e Informatica, Università degli Studi di Cagliari, Via Ospedale, 72 - 09124 Cagliari (Italy) and Department of Statistics, Universidad Carlos III de Madrid, C/Madrid, 126 - 09042 Getafe (Spain), \email{s.cabras@unica.it - stefano.cabras@uc3m.es}}
 %
 % Use the package "url.sty" to avoid
 % problems with special characters
@@ -50,13 +49,15 @@
 %
 \maketitle
 
-\abstract{We consider the problem of variable selection in ordinary linear regression model where the number of covariates is larger than the sample size and big enough to prevent exploration of all possible models. In this context, a stochastic model exploration with Gibbs-sampling is usually performed and limited to models of size no larger than the sample size. Gibbs-sampling also incorporates evidence of Bayes Factors derived either from conventional priors or from non-local priors. The focus here is on the prior on model space for which we explore the use of the Dirichlet Process (DP) prior on the space of all possible models. Models posterior probabilities are approximated combining the DP prior and the output of the Gibbs-sampling.}
+\abstract{We consider the problem of variable selection in general with specific focus on ordinary linear regression model where the number of covariates is larger and big enough to prevent exploration of all possible models. In this context, a stochastic model exploration with Gibbs-sampling. Although the empirical estimation of covariates inclusion probabilities (or other interesting feature) is consistent for a large number of steps, there is still space to improve such estimation in even a low number of steps with respect to the size of the model space. The focus is then on post-processing Gibbs-sampling output using a Dirichlet Process (DP) prior on the space of all possible models. The probability distribution on all model space is thus estimated combining the DP prior and the output of the Gibbs-sampling.}
 \abstract{\emph{Abstract in Italian}}
 \keywords{Conventional priors, Dirichlet Process, Non-local priors, Ordinary linear regression, Variable selection}
 
 \section{Introduction}
 \label{sec:intro}
 \cite{BVSNLP}
+
+
 
 \section{Dirichlet process prior on model space}
 \label{sec:dp}
