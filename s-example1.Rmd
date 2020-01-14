@@ -21,7 +21,7 @@ library(BayesVarSel)
 library(mixdir) 
 p=200 
 n=50 
-nsim.gibbs=1000
+nsim.gibbs=10000 
 m1=3 
 signaltonoise=3 
 ``` 
@@ -45,7 +45,7 @@ Suppose to explore the model space with `r nsim.gibbs` steps using Gibbs Samplin
 
 ```{r,cache=TRUE} 
 res.GibbsBvs<- GibbsBvs(formula= y ~ ., data=simdat, prior.betas="gZellner", 
-                        prior.models="Constant", n.iter=nsim.gibbs, init.model="Null", n.burnin=100, 
+                        prior.models="Constant", n.iter=nsim.gibbs, init.model="Full", n.burnin=100, 
                         time.test = FALSE)
 ``` 
 
@@ -64,7 +64,8 @@ image(xx[,1:10])
 This matrix is the of 0/1s that provides evidence for the true model into a part of the model space. In this case the explored models have the following sizes:
 
 ```{r}
-barplot(table(rowSums(xx)),xlab="Model sizes",las=2)
+barplot(table(rowSums(xx)),xlab="Model sizes")
+abline(v=n,lty=2)
 ```
 
 
@@ -90,7 +91,7 @@ Given one of the latent spaces, each covariate has a probability to be 1 or 0 (i
 The posterior probability of each covariate for the first latent space is (first `r m1` covariates belong to this latent space with high probability): 
 
 ```{r} 
-pls1=unlist(lapply(res$category_prob,function(x) x[[2]][2])) 
+pls1=unlist(lapply(res$category_prob,function(x) x[[1]][2])) 
 barplot(pls1[-1],col=c(rep(2,m1),rep(1,p-m1)),las=2,cex.axis=0.5,ylim=c(0,1)) 
 ``` 
 
@@ -100,7 +101,7 @@ The posterior probability of each covariate for the second latent space (which r
 
   
 ```{r} 
-pls2=unlist(lapply(res$category_prob,function(x) x[[1]][2])) 
+pls2=unlist(lapply(res$category_prob,function(x) x[[2]][2])) 
 barplot(pls2[-1],col=c(rep(2,m1),rep(1,p-m1)),las=2,cex.axis=0.5,ylim=c(0,1)) 
 ``` 
 
@@ -150,15 +151,14 @@ dim(riboflavin)
 ```{r,cache=TRUE}
 library(mombf)
 res.nonlocal<- modelSelection(y=riboflavin$y, x=riboflavin$x,
-                       scale=T, center=T,burnin = 100,
-                       niter = nsim.gibbs+100)
+                       scale=T, center=T,burnin = 100,niter = nsim.gibbs)
 res.nonlocal$margpp[res.nonlocal$margpp>.5]
 ```
 
 ## Analysis with Conventional prior and Gibbs sampling
 
 ```{r,cache=TRUE}
-res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),n.iter=nsim.gibbs+100, init.model="Null", n.burnin=100, time.test = FALSE)
+res.conventional<- GibbsBvs(formula=y~., data=as.data.frame(cbind(y=riboflavin$y, riboflavin$x)),prior.betas = "gZellner",n.iter=nsim.gibbs+100, init.model="Full", n.burnin=100, time.test = FALSE)
 res.conventional$inclprob[res.conventional$inclprob>0.5]
 ```
 
