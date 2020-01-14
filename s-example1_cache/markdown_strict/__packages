@@ -1,0 +1,12 @@
+base
+MASS
+mvtnorm
+BayesVarSel
+mixdir
+lars
+scalreg
+hdi
+ncvreg
+nlme
+mgcv
+mombf
